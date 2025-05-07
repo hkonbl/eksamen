@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Øv på Russiske Ord</title>
+  <style>
+    :root {
+      --bg: #fff;
+      --text: #000;
+      --card-bg: #e0e0e0;
+      --btn-primary: #4CAF50;
+      --btn-dark: #333;
+      --menu-bg: #f9f9f9;
+      --overlay-bg: rgba(0, 0, 0, 0.3);
+      --line-color: #ccc;
+    }
+
+    body.dark {
+      --bg: #121212;
+      --text: #f0f0f0;
+      --card-bg: #333;
+      --btn-primary: #009688;
+      --btn-dark: #666;
+      --menu-bg: #1e1e1e;
+      --overlay-bg: rgba(255, 255, 255, 0.1);
+      --line-color: #555;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+      overflow-x: hidden;
+    }
+
+    .menu-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .sidenav {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: var(--menu-bg);
+      padding-top: 60px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+      transition: left 0.3s ease;
+      z-index: 1002;
+    }
+
+    .sidenav.open {
+      left: 0;
+    }
+
+    .sidenav a {
+      display: block;
+      padding: 12px 24px;
+      text-decoration: none;
+      color: var(--text);
+      border-bottom: 1px solid var(--line-color);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: var(--overlay-bg);
+      z-index: 1000;
+      display: none;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 28px;
+    }
+
+    .container {
+      padding: 80px 20px 20px;
+    }
+
+    .word-pair {
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--line-color);
+      padding-bottom: 10px;
+    }
+
+    .russian {
+      font-weight: bold;
+    }
+
+    .norwegian {
+      font-weight: normal;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .btn-theme {
+      background: var(--btn-dark);
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn-theme:hover {
+      filter: brightness(90%);
+    }
+
+    @media screen and (max-width: 768px) {
+      .word-pair {
+        font-size: 16px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Menu Button -->
+  <div class="menu-icon" onclick="toggleMenu()">☰</div>
+
+  <!-- Sidenav (Menu) -->
+  <div class="sidenav" id="sidenav">
+    <a href="index.html">Øv på russiske verb</a>
+    <a href="flashcards.html">Flashcards</a>
+	<a href="revision.html">Øv på russiske ord og uttrykk</a>
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1>Øv på Russiske Ord</h1>
+    <div id="word-list"></div>
+
+    <div class="button-container">
+      <button class="btn-theme" onclick="toggleTheme()">Lys/Mørk modus</button>
+    </div>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+
+    function toggleMenu() {
+      document.getElementById("sidenav").classList.toggle("open");
+      document.getElementById("overlay").classList.toggle("active");
+    }
+
+    function closeMenu() {
+      document.getElementById("sidenav").classList.remove("open");
+      document.getElementById("overlay").classList.remove("active");
+    }
+
+    // Auto-enable dark mode if user prefers
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.classList.add('dark');
+    }
+
+    // Example data display logic
+    const wordList = document.getElementById("word-list");
+    const words = [
+      { "Russisk": "здравствуйте", "Norsk": "god dag" },
+      { "Russisk": "спасибо", "Norsk": "takk" },
+      { "Russisk": "пожалуйста", "Norsk": "vær så god" },
+      { "Russisk": "извините", "Norsk": "unnskyld" },
+      { "Russisk": "да", "Norsk": "ja" },
+      { "Russisk": "нет", "Norsk": "nei" }
+    ];
+
+    words.forEach(word => {
+      const div = document.createElement("div");
+      div.className = "word-pair";
+      div.innerHTML = `<span class="russian">${word.Russisk}</span><span class="norwegian">${word.Norsk}</span>`;
+      wordList.appendChild(div);
+    });
+  </script>
+</body>
+</html>

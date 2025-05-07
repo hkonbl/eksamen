@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Øv på russiske verb</title>
+  <style>
+    :root {
+      --bg: #fff;
+      --text: #000;
+      --tile-bg: lightgray;
+      --tile-reveal-bg: #4CAF50;
+      --tile-reveal-text: white;
+      --btn-next: #4CAF50;
+      --btn-reveal: #f44336;
+      --btn-dark: #333;
+      --menu-bg: #f9f9f9;
+      --overlay-bg: rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark {
+      --bg: #121212;
+      --text: #f0f0f0;
+      --tile-bg: #333;
+      --tile-reveal-bg: #009688;
+      --tile-reveal-text: white;
+      --btn-next: #009688;
+      --btn-reveal: #c62828;
+      --btn-dark: #666;
+      --menu-bg: #1e1e1e;
+      --overlay-bg: rgba(255, 255, 255, 0.1);
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      margin: 0;
+      text-align: center;
+      transition: background 0.3s, color 0.3s;
+      overflow-x: hidden;
+    }
+
+    /* Menu styles */
+    .menu-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .sidenav {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: var(--menu-bg);
+      padding-top: 60px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+      transition: left 0.3s ease;
+      z-index: 1002;
+    }
+
+    .sidenav.open {
+      left: 0;
+    }
+
+    .sidenav a {
+      display: block;
+      padding: 12px 24px;
+      text-decoration: none;
+      color: var(--text);
+      border-bottom: 1px solid #ccc;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: var(--overlay-bg);
+      z-index: 1000;
+      display: none;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    #verb {
+      font-size: 24px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+
+    .section-title {
+      margin: 10px 0 5px;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .tiles-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .tile {
+      background-color: var(--tile-bg);
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      user-select: none;
+      opacity: 0;
+      color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      flex: 1 1 calc(50% - 20px);
+      max-width: 200px;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+
+    .tile.revealed {
+      opacity: 1;
+      color: var(--tile-reveal-text);
+      background-color: var(--tile-reveal-bg);
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .button-container button {
+      flex: 1 1 45%;
+      max-width: 200px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    #next-btn { background-color: var(--btn-next); }
+    #reveal-all-btn { background-color: var(--btn-reveal); }
+    #toggle-theme { background-color: var(--btn-dark); }
+  </style>
+</head>
+<body>
+
+  <!-- Menu Button -->
+  <div class="menu-icon" onclick="toggleMenu()">☰</div>
+
+  <!-- Sidenav (Menu) -->
+  <div class="sidenav" id="sidenav">
+    <a href="index.html">Øv på russiske verb</a>
+    <a href="flashcards.html">Flashcards</a>
+	<a href="revision.html">Øv på russiske ord og uttrykk</a>
+  </div>
+
+  <!-- Overlay for menu close when clicked outside -->
+  <div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+  <h1>Øv på russiske verb</h1>
+  <div id="verb">Laster...</div>
+
+  <div class="section-title">Oversettelse</div>
+  <div class="tiles-section" id="translation-container"></div>
+
+  <div class="section-title">Presens</div>
+  <div class="tiles-section" id="presens-tiles"></div>
+
+  <div class="section-title">Preteritum</div>
+  <div class="tiles-section" id="preteritum-tiles"></div>
+
+  <div class="button-container">
+    <button id="reveal-all-btn">Vis alle</button>
+    <button id="next-btn">Neste verb</button>
+    <button id="toggle-theme">Mørkt tema</button>
+  </div>
+
+  <script id="verbs-data" type="application/json">
+  [
+    {
+      "Russisk verb": "идти",
+      "Norsk oversettelse": "å gå (bestemt)",
+      "Presens 1. pers. entall": "иду",
+      "Presens 2. pers. entall": "идёшь",
+      "Presens 3. pers. entall": "идёт",
+      "Presens 1. pers. flertall": "идём",
+      "Presens 2. pers. flertall": "идёте",
+      "Presens 3. pers. flertall": "идут",
+      "Preteritum mask.": "шёл",
+      "Preteritum fem.": "шла",
+      "Preteritum nøytr.": "шло",
+      "Preteritum flertall": "шли"
+    },
+    {
+      "Russisk verb": "ходить",
+      "Norsk oversettelse": "å gå (ubestemt)",
+      "Presens 1. pers. entall": "хожу",
+      "Presens 2. pers. entall": "ходишь",
+      "Presens 3. pers. entall": "ходит",
+      "Presens 1. pers. flertall": "ходим",
+      "Presens 2. pers. flertall": "ходите",
+      "Presens 3. pers. flertall": "ходят",
+      "Preteritum mask.": "ходил",
+      "Preteritum fem.": "ходила",
+      "Preteritum nøytr.": "ходило",
+      "Preteritum flertall": "ходили"
+    }
+  ]
+  </script>
+
+  <script>
+    const verbs = JSON.parse(document.getElementById("verbs-data").textContent);
+    let currentIndex = Math.floor(Math.random() * verbs.length);
+
+    const verbDisplay = document.getElementById("verb");
+    const translationContainer = document.getElementById("translation-container");
+    const presensTiles = document.getElementById("presens-tiles");
+    const preteritumTiles = document.getElementById("preteritum-tiles");
+    const nextBtn = document.getElementById("next-btn");
+    const revealAllBtn = document.getElementById("reveal-all-btn");
+    const toggleThemeBtn = document.getElementById("toggle-theme");
+
+    function createTile(text) {
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      tile.textContent = text;
+      setTimeout(() => (tile.style.opacity = 1), 100);
+      tile.addEventListener("click", () => tile.classList.toggle("revealed"));
+      return tile;
+    }
+
+    function renderVerb(verb) {
+      verbDisplay.textContent = verb["Russisk verb"];
+      translationContainer.innerHTML = "";
+      presensTiles.innerHTML = "";
+      preteritumTiles.innerHTML = "";
+
+      const translationTile = createTile(verb["Norsk oversettelse"]);
+      translationContainer.appendChild(translationTile);
+
+      for (const [key, value] of Object.entries(verb)) {
+        if (key.startsWith("Presens")) presensTiles.appendChild(createTile(value));
+        if (key.startsWith("Preteritum")) preteritumTiles.appendChild(createTile(value));
+      }
+    }
+
+    function nextVerb() {
+      currentIndex = (currentIndex + 1) % verbs.length;
+      renderVerb(verbs[currentIndex]);
+    }
+
+    function revealAll() {
+      document.querySelectorAll(".tile").forEach(tile => tile.classList.add("revealed"));
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+
+    function toggleMenu() {
+      sidenav.classList.toggle("open");
+      overlay.classList.toggle("active");
+    }
+
+    function closeMenu() {
+      sidenav.classList.remove("open");
+      overlay.classList.remove("active");
+    }
+
+    // Auto-detect theme based on user's system preferences
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.classList.add("dark");
+    }
+
+    renderVerb(verbs[currentIndex]);
+    nextBtn.addEventListener("click", nextVerb);
+    revealAllBtn.addEventListener("click", revealAll);
+    toggleThemeBtn.addEventListener("click", toggleTheme);
+  </script>
+</body>
+</html>

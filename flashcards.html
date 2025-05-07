@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flashkort - Russiske Ord</title>
+  <style>
+    :root {
+      --bg: #fff;
+      --text: #000;
+      --card-bg: #e0e0e0;
+      --card-flip-bg: #4CAF50;
+      --card-flip-text: white;
+      --btn-primary: #4CAF50;
+      --btn-secondary: #f44336;
+      --btn-dark: #333;
+      --menu-bg: #f9f9f9;
+      --overlay-bg: rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark {
+      --bg: #121212;
+      --text: #f0f0f0;
+      --card-bg: #333;
+      --card-flip-bg: #009688;
+      --card-flip-text: white;
+      --btn-primary: #009688;
+      --btn-secondary: #c62828;
+      --btn-dark: #666;
+      --menu-bg: #1e1e1e;
+      --overlay-bg: rgba(255, 255, 255, 0.1);
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+      overflow-x: hidden;
+    }
+
+    /* Menu styles */
+    .menu-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .sidenav {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: var(--menu-bg);
+      padding-top: 60px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+      transition: left 0.3s ease;
+      z-index: 1002;
+    }
+
+    .sidenav.open {
+      left: 0;
+    }
+
+    .sidenav a {
+      display: block;
+      padding: 12px 24px;
+      text-decoration: none;
+      color: var(--text);
+      border-bottom: 1px solid #ccc;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: var(--overlay-bg);
+      z-index: 1000;
+      display: none;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    /* Flashcard styles */
+    .container {
+      padding: 80px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+
+    .flashcard-container {
+      perspective: 1000px;
+      width: 80%;
+      max-width: 400px;
+      height: 200px;
+      margin-bottom: 30px;
+    }
+
+    .flashcard {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+      cursor: pointer;
+    }
+
+    .flashcard.flipped {
+      transform: rotateX(180deg);
+    }
+
+    .flashcard-side {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      background: var(--card-bg);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .flashcard-back {
+      background: var(--card-flip-bg);
+      color: var(--card-flip-text);
+      transform: rotateX(180deg);
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 420px;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .button-row button {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn-reverse { background: var(--btn-secondary); }
+    .btn-next { background: var(--btn-primary); }
+
+    .btn-theme {
+      background: var(--btn-dark);
+      color: white;
+      padding: 12px;
+      width: 100%;
+      max-width: 420px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .slide-left {
+      animation: slideLeft 0.5s forwards;
+    }
+
+    @keyframes slideLeft {
+      0% { transform: translateX(0); opacity: 1; }
+      100% { transform: translateX(-150%); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Menu Button -->
+  <div class="menu-icon" onclick="toggleMenu()">☰</div>
+
+  <!-- Sidenav (Menu) -->
+  <div class="sidenav" id="sidenav">
+    <a href="index.html">Øv på russiske verb</a>
+    <a href="flashcards.html">Flashcards</a>
+	<a href="revision.html">Øv på russiske ord og uttrykk</a>
+  </div>
+
+  <!-- Overlay for menu close when clicked outside -->
+  <div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+  <!-- Flashcard Container -->
+  <div class="container">
+    <h1>Øv på gloser</h1>
+
+    <div class="flashcard-container" id="flashcard-container">
+      <div class="flashcard" id="flashcard">
+        <div class="flashcard-side flashcard-front" id="flashcard-front"></div>
+        <div class="flashcard-side flashcard-back" id="flashcard-back"></div>
+      </div>
+    </div>
+
+    <div class="button-row">
+      <button class="btn-reverse" onclick="toggleOrder()">Rekkefølge</button>
+      <button class="btn-next" onclick="nextCardAnimated()">Ny ord</button>
+    </div>
+    <button class="btn-theme" onclick="toggleTheme()">Lys/Mørk modus</button>
+  </div>
+
+  <script id="word-data" type="application/json">
+  [
+    { "Russisk": "здравствуйте", "Norsk": "god dag" },
+    { "Russisk": "спасибо", "Norsk": "takk" },
+    { "Russisk": "пожалуйста", "Norsk": "vær så god" },
+    { "Russisk": "извините", "Norsk": "unnskyld" },
+    { "Russisk": "да", "Norsk": "ja" },
+    { "Russisk": "нет", "Norsk": "nei" }
+  ]
+  </script>
+
+  <script>
+    const words = JSON.parse(document.getElementById("word-data").textContent);
+    let currentIndex = 0;
+    let flipped = false;
+    let reverse = false;
+
+    const flashcard = document.getElementById("flashcard");
+    const front = document.getElementById("flashcard-front");
+    const back = document.getElementById("flashcard-back");
+    const sidenav = document.getElementById("sidenav");
+    const overlay = document.getElementById("overlay");
+
+    function renderCard() {
+      const word = words[currentIndex];
+      if (!reverse) {
+        front.textContent = word["Russisk"];
+        back.textContent = word["Norsk"];
+      } else {
+        front.textContent = word["Norsk"];
+        back.textContent = word["Russisk"];
+      }
+      flashcard.classList.remove("flipped");
+      flipped = false;
+    }
+
+    function nextCardAnimated() {
+      flashcard.classList.add("slide-left");
+      flashcard.addEventListener('animationend', () => {
+        flashcard.classList.remove("slide-left");
+        currentIndex = (currentIndex + 1) % words.length;
+        renderCard();
+      }, { once: true });
+    }
+
+    function toggleOrder() {
+      reverse = !reverse;
+      renderCard();
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+
+    function toggleMenu() {
+      sidenav.classList.toggle("open");
+      overlay.classList.toggle("active");
+    }
+
+    function closeMenu() {
+      sidenav.classList.remove("open");
+      overlay.classList.remove("active");
+    }
+
+    flashcard.addEventListener("click", () => {
+      flipped = !flipped;
+      flashcard.classList.toggle("flipped");
+    });
+
+    // Swipe detection
+    let startX = 0;
+
+    function handleSwipeStart(e) {
+      startX = e.touches ? e.touches[0].clientX : e.clientX;
+    }
+
+    function handleSwipeEnd(e) {
+      const endX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+      if (Math.abs(startX - endX) > 50) {
+        nextCardAnimated();
+      }
+    }
+
+    flashcard.addEventListener('touchstart', handleSwipeStart, false);
+    flashcard.addEventListener('touchend', handleSwipeEnd, false);
+    flashcard.addEventListener('mousedown', handleSwipeStart, false);
+    flashcard.addEventListener('mouseup', handleSwipeEnd, false);
+
+    // Init
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.classList.add("dark");
+    }
+    renderCard();
+  </script>
+</body>
+</html>
