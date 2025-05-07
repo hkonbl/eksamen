@@ -2891,6 +2891,14 @@
     nextBtn.addEventListener("click", nextVerb);
     revealAllBtn.addEventListener("click", revealAll);
     toggleThemeBtn.addEventListener("click", toggleTheme);
+
+    if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/verb/service-worker.js')
+        .then(reg => console.log("Service Worker registrert:", reg.scope))
+        .catch(err => console.log("Service Worker-feil:", err));
+  });
+}  
   </script>
 </body>
 </html>
