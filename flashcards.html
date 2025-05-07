@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Flashcards</title>
-	<link rel="manifest" href="/eksamen/manifest.json" />
-  <link rel="icon" href="/verb/icon-192.png" type="image/png">
-	<meta name="theme-color" content="#4CAF50">
+  <link rel="manifest" href="/eksamen/manifest.json" />
+  <link rel="icon" href="/eksamen/icon-192.png" type="image/png">
+  <meta name="theme-color" content="#4CAF50">
   <style>
+    /* (Your existing CSS remains unchanged) */
     :root {
       --bg: #fff;
       --text: #000;
@@ -43,7 +44,6 @@
       overflow-x: hidden;
     }
 
-    /* Menu styles */
     .menu-icon {
       position: absolute;
       top: 10px;
@@ -93,7 +93,6 @@
       display: block;
     }
 
-    /* Flashcard styles */
     .container {
       padding: 80px 20px 20px;
       display: flex;
@@ -111,7 +110,7 @@
       width: 80%;
       max-width: 400px;
       height: 200px;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
 
     .flashcard {
@@ -195,20 +194,16 @@
   </style>
 </head>
 <body>
-  <!-- Menu Button -->
   <div class="menu-icon" onclick="toggleMenu()">☰</div>
 
-  <!-- Sidenav (Menu) -->
   <div class="sidenav" id="sidenav">
     <a href="index.html">Øv på russiske verb</a>
     <a href="flashcards.html">Flashcards</a>
-	<a href="revision.html">Øv på russiske ord og uttrykk</a>
+    <a href="revision.html">Øv på russiske ord og uttrykk</a>
   </div>
 
-  <!-- Overlay for menu close when clicked outside -->
   <div class="overlay" id="overlay" onclick="closeMenu()"></div>
 
-  <!-- Flashcard Container -->
   <div class="container">
     <h1>Øv på gloser</h1>
 
@@ -218,6 +213,8 @@
         <div class="flashcard-side flashcard-back" id="flashcard-back"></div>
       </div>
     </div>
+
+    <div id="counter" style="margin-bottom: 20px; font-size: 18px;"></div>
 
     <div class="button-row">
       <button class="btn-reverse" onclick="toggleOrder()">Endre språk</button>
@@ -524,6 +521,7 @@
   <script>
     const words = JSON.parse(document.getElementById("word-data").textContent);
     let currentIndex = 0;
+    let shuffledWords = shuffleArray([...words]);
     let flipped = false;
     let reverse = false;
 
@@ -533,8 +531,16 @@
     const sidenav = document.getElementById("sidenav");
     const overlay = document.getElementById("overlay");
 
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
     function renderCard() {
-      const word = words[currentIndex];
+      const word = shuffledWords[currentIndex];
       if (!reverse) {
         front.textContent = word["Russisk"];
         back.textContent = word["Norsk"];
@@ -544,15 +550,25 @@
       }
       flashcard.classList.remove("flipped");
       flipped = false;
+      updateCounter();
     }
 
     function nextCardAnimated() {
       flashcard.classList.add("slide-left");
       flashcard.addEventListener('animationend', () => {
         flashcard.classList.remove("slide-left");
-        currentIndex = (currentIndex + 1) % words.length;
+        currentIndex++;
+        if (currentIndex >= shuffledWords.length) {
+          shuffledWords = shuffleArray([...words]);
+          currentIndex = 0;
+        }
         renderCard();
       }, { once: true });
+    }
+
+    function updateCounter() {
+      document.getElementById("counter").textContent =
+        `Kort ${currentIndex + 1} av ${shuffledWords.length}`;
     }
 
     function toggleOrder() {
@@ -598,10 +614,10 @@
     flashcard.addEventListener('mousedown', handleSwipeStart, false);
     flashcard.addEventListener('mouseup', handleSwipeEnd, false);
 
-    // Init
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       document.body.classList.add("dark");
     }
+
     renderCard();
   </script>
 </body>
