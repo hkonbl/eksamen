@@ -1,12 +1,12 @@
-const CACHE_NAME = 'verb-cache-v1';
+const CACHE_NAME = 'eksamen-cache-v1';
 const urlsToCache = [
-  '/verb/',
-  '/verb/index.html',
-  '/verb/flashcards.html',
-  '/verb/revision.html',
-  '/verb/manifest.json',
-  '/verb/icon-192.png',
-  '/verb/icon-512.png'
+  '/eksamen/',
+  '/eksamen/index.html',
+  '/eksamen/flashcards.html',
+  '/eksamen/revision.html',
+  '/eksamen/manifest.json',
+  '/eksamen/icon-192.png',
+  '/eksamen/icon-512.png'
 ];
 
 // Legg til flere filer om f.eks. CSS eller JS-eksternt
