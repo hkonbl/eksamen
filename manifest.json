@@ -1,7 +1,7 @@
 {
   "name": "Rus-1001",
   "short_name": "Russisk",
-  "start_url": "/verb/",
+  "start_url": "/eksamen/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4CAF50",
